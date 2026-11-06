@@ -2,5 +2,9 @@
   "name": "orchestrate",
   "description": "Run multi-stage plans with a thin orchestrator: delegate tasks, keep context small, and get reminded when to /clear",
   "version": "1.0.0",
-  "license": "MIT"
+  "author": { "name": "MG" },
+  "homepage": "https://github.com/mmgghh/claude-orchestrate",
+  "repository": "https://github.com/mmgghh/claude-orchestrate",
+  "license": "MIT",
+  "keywords": ["orchestrator", "subagents", "context", "plan", "clear"]
 }

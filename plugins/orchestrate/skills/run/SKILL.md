@@ -1,6 +1,7 @@
 ---
 name: run
 description: Run a multi-stage plan as a thin, long-lived orchestrator that delegates tasks, keeps context small, and tells the user when to /clear. Use when the user runs /orchestrate:run or asks to execute or resume a multi-stage plan.
+argument-hint: "[plan-file]"
 ---
 
 # Orchestrator protocol
@@ -25,7 +26,7 @@ The plan file is the single source of truth. Plan file: $ARGUMENTS (default: `do
 
 **Worker rules:**
 - Use a fresh, named subagent (`implementer`, `reviewer`, `Explore`) if one exists. Otherwise use `general-purpose`.
-- Never fork for plan tasks.
+- Never use a forked subagent for plan tasks: a fork inherits your whole context, which defeats the purpose.
 - Pass a pointer, not pasted context. Use this template:
 
 ```
@@ -38,7 +39,7 @@ Do not paste diffs, file contents or full logs.
 **After each task:**
 1. Tick its checkbox in the plan file.
 2. Append one line to `docs/progress/log.md`: `<ID> · done/blocked · one-line note`.
-3. Commit if the task left the tests green.
+3. Commit if the task left the tests green, unless the user said not to commit.
 
 State must live in files, never only in chat.
 
@@ -46,7 +47,7 @@ State must live in files, never only in chat.
 
 - Read files narrowly: grep first, then read with offset and limit. Don't re-read a file you already summarized.
 - Never ask a worker for a detailed report. Summaries only.
-- Don't switch plan mode on or off mid-stage. With opusplan, every switch re-reads the whole conversation without cache.
+- Don't switch plan mode or models mid-stage. A switch (for example with the opusplan alias) invalidates the prompt cache, so the whole conversation is re-read at full price.
 
 ## 4. When to tell the user to /clear
 
@@ -64,7 +65,7 @@ You cannot run /clear yourself, so remind the user at these moments:
 - Before reminding, make sure the plan file and progress log are up to date and the work is committed.
 - Use this exact format, as the last thing in your message:
 
-> 🧹 **Good time to /clear** — <reason, e.g. "Stage 6 done">. State is saved in `<plan file>`.
+> 🧹 **Good time to /clear** — <reason, e.g. "Stage 1 done">. State is saved in `<plan file>`.
 > After clearing, run: `/orchestrate:run <plan file>`
 
 ## Plan file format
@@ -72,8 +73,8 @@ You cannot run /clear yourself, so remind the user at these moments:
 ```markdown
 # Plan: <project>
 
-## Stage 6 — <goal>
-- [x] 6.A1 <task> · files: <paths> · test: <command>
-- [ ] 6.C1 <task> · files: <paths> · test: <command>
-- [ ] 6.C2 <task> · depends on 6.C1
+## Stage 1 — <goal>
+- [x] 1.A1 <task> · files: <paths> · test: <command>
+- [ ] 1.B1 <task> · files: <paths> · test: <command>
+- [ ] 1.B2 <task> · depends on 1.B1
 ```

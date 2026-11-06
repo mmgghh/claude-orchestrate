@@ -6,6 +6,7 @@ Reminds once when the context crosses CLEAR_REMIND_AT, then again every CLEAR_RE
 """
 import json
 import os
+import re
 import sys
 import tempfile
 
@@ -41,9 +42,8 @@ def main():
     except ValueError:
         return
     tokens = context_tokens(data.get("transcript_path"))
-    state_file = os.path.join(
-        tempfile.gettempdir(), "clear-reminder-" + str(data.get("session_id", "default"))
-    )
+    session = re.sub(r"[^A-Za-z0-9_-]", "_", str(data.get("session_id", "default")))
+    state_file = os.path.join(tempfile.gettempdir(), "clear-reminder-" + session)
 
     if tokens < WARN_AT:
         try:
@@ -60,8 +60,11 @@ def main():
     if last_warned and last_warned <= tokens < last_warned + STEP:
         return
 
-    with open(state_file, "w") as f:
-        f.write(str(tokens))
+    try:
+        with open(state_file, "w") as f:
+            f.write(str(tokens))
+    except OSError:
+        pass  # can't remember the warning, so it may repeat; still better than failing the hook
     print(json.dumps({
         "systemMessage": (
             f"🧹 Context is ~{tokens // 1000}k tokens. Finish the current task, "
