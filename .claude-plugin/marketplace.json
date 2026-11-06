@@ -1,0 +1,12 @@
+{
+  "name": "claude-orchestrate",
+  "description": "A thin, long-lived orchestrator for multi-stage plans in Claude Code",
+  "owner": { "name": "claude-orchestrate" },
+  "plugins": [
+    {
+      "name": "orchestrate",
+      "source": "./plugins/orchestrate",
+      "description": "Run multi-stage plans with a thin orchestrator and get reminded when to /clear"
+    }
+  ]
+}
