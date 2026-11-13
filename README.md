@@ -2,7 +2,7 @@
 
 A Claude Code plugin for running big, multi-stage plans without burning through your usage limits.
 
-It turns your main session into a **thin orchestrator**: the plan lives in a file, tasks go to small focused workers that report back in a few lines, and Claude tells you when it's a good moment to `/clear`. A hook also warns you when your session's context grows past about 150k tokens.
+It turns your main session into a **thin orchestrator**: Claude writes the plan for you to approve, the plan lives in a file, tasks go to small focused workers that report back in a few lines, and Claude tells you when it's a good moment to `/clear`. A hook also warns you when your session's context grows past about 150k tokens.
 
 ## Install
 
@@ -17,32 +17,43 @@ To try it without installing: `claude --plugin-dir ./plugins/orchestrate`
 
 ## Use
 
-1. Write your plan in plan mode and save it as a checklist, for example `docs/plan.md`:
-
-   ```markdown
-   ## Stage 1 — <goal>
-   - [ ] 1.A1 <task> · files: <paths> · test: <command>
-   - [ ] 1.A2 <task> · depends on 1.A1
-   ```
-
-2. Start or resume the orchestrator:
+1. Say what you want:
 
    ```
-   /orchestrate:run docs/plan.md
+   /orchestrate:run add CSV export to the reports page
    ```
 
-3. When you see **🧹 Good time to /clear**, run `/clear`, then `/orchestrate:run docs/plan.md` again. Progress is saved in the plan file, so nothing is lost.
+2. Answer the intake message. Claude asks at most three questions, each with a default, and invites you to write anything else freely: your intent, constraints, things to avoid. Reply `go` to accept the defaults.
+
+3. Review the plan. Claude writes it to `docs/plan.md` and shows you the stages and tasks. Reply `approve`, ask for changes, or edit the file yourself and then approve. Nothing is executed before you approve.
+
+4. When you see **🧹 Good time to /clear**, run `/clear`, then `/orchestrate:run` again. Progress is saved in the plan file, so nothing is lost.
+
+To resume later, run `/orchestrate:run` with no argument, or pass the plan file: `/orchestrate:run docs/plan-export.md`.
+
+### Bring your own plan
+
+You can also write the plan yourself and pass its path. The format is a checklist:
+
+```markdown
+## Stage 1 — <goal>
+- [ ] 1.A1 <task> · files: <paths> · test: <command>
+- [ ] 1.A2 <task> · depends on 1.A1
+```
+
+Plans in other checklist formats work too, for example a superpowers plan with `### Task N` headings and `- [ ]` steps.
 
 ## What's inside
 
 | Part | What it does |
 | --- | --- |
 | `skills/run` | The orchestrator protocol: delegate with pointers instead of pasted context, keep worker replies short, save state to files, and remind you to `/clear` at stage boundaries, topic changes, and breaks |
+| `skills/plan` | The planning steps: ask you once, save your notes as a brief, write the plan, and wait for your approval. `run` loads it only when you give it a new goal, so resuming a plan stays cheap |
 | `hooks/clear-reminder.py` | A `Stop` hook that reads the session's real context size and shows a 🧹 warning past 150k tokens, then every 40k after that. It goes quiet after you clear |
 
 ## What it does (and doesn't)
 
-The skill is plain Markdown. The hook is one short Python script that runs locally: it reads only the token counts in your session transcript, makes no network calls, and writes a tiny state file to your system temp folder. It never sends or stores your conversation.
+The skills are plain Markdown. The hook is one short Python script that runs locally: it reads only the token counts in your session transcript, makes no network calls, and writes a tiny state file to your system temp folder. It never sends or stores your conversation.
 
 ## Settings
 
@@ -57,7 +68,7 @@ The hook needs `python3` on your PATH.
 
 ## How it differs from similar tools
 
-This plugin is deliberately small: one ~500-word skill and one hook, with no review stages, agents or dependencies. If you want something heavier or different, these are worth a look:
+This plugin is deliberately small: two short skills and one hook, with no review stages, agents or dependencies. If you want something heavier or different, these are worth a look:
 
 | Project | Pick it when you want |
 | --- | --- |
