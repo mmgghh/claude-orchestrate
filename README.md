@@ -23,7 +23,7 @@ To try it without installing: `claude --plugin-dir ./plugins/orchestrate`
    /orchestrate:run add CSV export to the reports page
    ```
 
-2. Answer the intake message. Claude asks at most three questions, each with a default, and invites you to write anything else freely: your intent, constraints, things to avoid. Reply `go` to accept the defaults.
+2. Answer the intake message. Claude asks only the questions the plan needs (up to ten, fewer when it can), each with a recommended answer, and invites you to write anything else freely: your intent, constraints, things to avoid. Answer by number, or reply `go` to accept all the recommendations.
 
 3. Review the plan. Claude writes it to `docs/plan.md` and shows you the stages and tasks. Reply `approve`, ask for changes, or edit the file yourself and then approve. Nothing is executed before you approve.
 

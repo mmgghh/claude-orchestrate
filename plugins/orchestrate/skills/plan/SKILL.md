@@ -18,14 +18,14 @@ Goal: $ARGUMENTS
    ```
    **Goal as I understand it:** <one or two lines>
 
-   **Questions** (answer by number, or skip one to take its default)
-   1. <question>? Default: <your pick>
+   **Questions** (answer by number, or skip one to take my recommendation)
+   1. <question>? Recommended: <your pick>
 
    **Anything else?** Write freely: what you are after, constraints, preferences, things to avoid.
-   Or reply `go` to plan with the defaults.
+   Or reply `go` to accept all my recommendations.
    ```
 
-   Ask at most 3 questions. Each one is something only the user can answer and that changes the plan: scope, priorities, constraints. With no such question, send the message without the Questions block.
+   Ask as few questions as the plan needs, and never more than 10. Ask a question only if it is something only the user can answer and a wrong guess would noticeably hurt the plan: scope, priorities, constraints, risky or hard-to-reverse choices. The more a question affects the quality of the plan, the more it is worth asking. Do not ask about details you can decide yourself or the planner can find in the code. Every question carries a concrete recommendation, so replying `go` is always a good answer. Put the questions that matter most first. With no such question, send the message without the Questions block.
 
 3. **Save the brief.** Create `docs/plan.md`, or `docs/plan-<slug>.md` if that file exists:
 
