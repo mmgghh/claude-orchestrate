@@ -7,13 +7,13 @@ user-invocable: false
 
 # Planning a new goal
 
-You write the plan and the user approves it. Nothing runs before they approve.
+You write the plan and the user approves it in step 5. Nothing runs before that, and no earlier reply counts as approval.
 
 Goal: $ARGUMENTS
 
 1. **Look.** List the top-level files and read the first 40 lines of the README. Leave deeper exploring to the planner.
 
-2. **Ask once.** Send one message in this shape, then wait:
+2. **Ask once.** Send one message in this shape, then wait. Do this even when you have no questions: leave out the Questions block, and the user still gets to add their notes.
 
    ```
    **Goal as I understand it:** <one or two lines>
@@ -22,10 +22,10 @@ Goal: $ARGUMENTS
    1. <question>? Recommended: <your pick>
 
    **Anything else?** Write freely: what you are after, constraints, preferences, things to avoid.
-   Or reply `go` to accept all my recommendations.
+   Or reply `go` to accept all my recommendations. Either way, I will show you the plan to approve before anything runs.
    ```
 
-   Ask as few questions as the plan needs, and never more than 10. Ask a question only if it is something only the user can answer and a wrong guess would noticeably hurt the plan: scope, priorities, constraints, risky or hard-to-reverse choices. The more a question affects the quality of the plan, the more it is worth asking. Do not ask about details you can decide yourself or the planner can find in the code. Every question carries a concrete recommendation, so replying `go` is always a good answer. Put the questions that matter most first. With no such question, send the message without the Questions block.
+   The reply to this message, `go` included, is input for the plan and never approval of it. Ask as few questions as the plan needs, and never more than 10. Ask a question only if it is something only the user can answer and a wrong guess would noticeably hurt the plan: scope, priorities, constraints, risky or hard-to-reverse choices. The more a question affects the quality of the plan, the more it is worth asking. Do not ask about details you can decide yourself or the planner can find in the code. Every question carries a concrete recommendation, so replying `go` is always a good answer. Put the questions that matter most first.
 
 3. **Save the brief.** Create `docs/plan.md`, or `docs/plan-<slug>.md` if that file exists:
 
@@ -61,7 +61,7 @@ Goal: $ARGUMENTS
 
    > Reply `approve` to start, tell me what to change, or edit the file yourself and then say `approve`.
 
-   For changes, make them (send large ones back to a worker), say what changed, and ask again. If the user edited the file, grep it again. On approval, set `Status: approved`.
+   Then wait. Approval is the user's reply to this review message. For changes, make them (send large ones back to a worker), say what changed, and ask again. If the user edited the file, grep it again. On approval, set `Status: approved`.
 
 6. **Clear or continue.** If planning took more than one round of questions or changes, or this session held other work before the plan, end your message with exactly:
 

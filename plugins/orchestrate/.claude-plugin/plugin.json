@@ -1,7 +1,7 @@
 {
   "name": "orchestrate",
   "description": "Run multi-stage plans with a thin orchestrator: delegate tasks, keep context small, and get reminded when to /clear",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": { "name": "MG" },
   "homepage": "https://github.com/mmgghh/claude-orchestrate",
   "repository": "https://github.com/mmgghh/claude-orchestrate",

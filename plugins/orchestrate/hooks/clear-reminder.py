@@ -10,8 +10,16 @@ import re
 import sys
 import tempfile
 
-WARN_AT = int(os.environ.get("CLEAR_REMIND_AT", "150000"))
-STEP = int(os.environ.get("CLEAR_REMIND_STEP", "40000"))
+
+def env_int(name, default):
+    try:
+        return int(os.environ.get(name, default))
+    except ValueError:
+        return default  # a bad value must not break the hook on every turn
+
+
+WARN_AT = env_int("CLEAR_REMIND_AT", 150000)
+STEP = env_int("CLEAR_REMIND_STEP", 40000)
 USAGE_KEYS = ("input_tokens", "cache_creation_input_tokens", "cache_read_input_tokens")
 
 
