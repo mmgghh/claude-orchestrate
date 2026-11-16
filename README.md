@@ -2,7 +2,7 @@
 
 A Claude Code plugin for running big, multi-stage plans without burning through your usage limits.
 
-It turns your main session into a **thin orchestrator**: Claude writes the plan for you to approve, the plan lives in a file, tasks go to small focused workers that report back in a few lines, and Claude tells you when it's a good moment to `/clear`. A hook also warns you when your session's context grows past about 150k tokens.
+It turns your main session into a **thin orchestrator**: Claude writes the plan for you to approve, the plan lives in a file, and tasks go to small focused workers that report back in a few lines. You choose how the stages run: one at a time, with Claude telling you when it's a good moment to `/clear`, or all of them back to back with no clearing at all. A hook also warns you when your session's context grows past about 150k tokens.
 
 ## Install
 
@@ -25,13 +25,26 @@ To try it without installing: `claude --plugin-dir ./plugins/orchestrate`
 
 2. Answer the intake message. Claude asks only the questions the plan needs (up to ten, fewer when it can), each with a recommended answer, and invites you to write anything else freely: your intent, constraints, things to avoid. Answer by number, or reply `go` to accept all the recommendations. `go` only settles the questions: you still approve the plan in the next step.
 
-3. Review the plan. Claude writes it to `docs/plan.md` and shows you the stages and tasks. Reply `approve`, ask for changes, or edit the file yourself and then approve. Nothing is executed before you approve.
+3. Review the plan. Claude writes it to `docs/orchestrate/plan.md` and shows you the stages and tasks. Reply `approve` to run one stage at a time, or `approve auto` to run every stage without stopping (see [Two ways to run](#two-ways-to-run)). You can also ask for changes, or edit the file yourself and then approve. Nothing is executed before you approve.
 
-4. Claude works through one stage, then stops. For each finished task it ticks the box in the plan file, adds a line to `docs/progress/log.md`, and commits that task's files if its tests pass. Say so up front if you don't want commits. A task it cannot finish is logged as blocked, left unticked, and brought to you.
+4. Claude works through the plan. For each finished task it ticks the box in the plan file, adds a line to `docs/orchestrate/progress/log.md`, and commits that task's files if its tests pass. Say so up front if you don't want commits. A task it cannot finish is logged as blocked, left unticked, and brought to you.
 
-5. When you see **🧹 Good time to /clear**, run `/clear`, then `/orchestrate:run` again. Progress is saved in the plan file, so nothing is lost. To keep going in the same session instead, reply `continue`.
+5. If you replied `approve`, Claude stops after each stage. When you see **🧹 Good time to /clear**, run `/clear`, then `/orchestrate:run` again. Progress is saved in the plan file, so nothing is lost. To keep going in the same session instead, reply `continue`. If you replied `approve auto`, there is nothing to do here: Claude carries on until the plan is done.
 
-To resume later, run `/orchestrate:run` with no argument, or pass the plan file: `/orchestrate:run docs/plan-export.md`.
+To resume later, run `/orchestrate:run` with no argument, or pass the plan file: `/orchestrate:run docs/orchestrate/plan-export.md`. Plans made before version 1.2 live in `docs/plan.md`: pass that path to resume one.
+
+### Two ways to run
+
+| | `approve` (manual) | `approve auto` |
+| --- | --- | --- |
+| Between stages | Claude stops and suggests `/clear`. You clear and run `/orchestrate:run` again | Nothing for you to do. Each stage runs in its own fresh subagent, so the main session stays small and never needs clearing |
+| What you see | Each task as it happens | One line per stage. The detail is in the log and the commits |
+| When it stops | At the end of every stage | When the plan is done, or when a stage is blocked |
+| Questions mid-stage | Claude asks you | A stage cannot ask you. It comes back as blocked and the run stops |
+
+Manual gives you a checkpoint after every stage. Auto gives that up so you can walk away.
+
+Your choice is saved in the plan file as a `Mode:` line. To switch, edit that line or tell Claude.
 
 ### Bring your own plan
 
@@ -50,6 +63,7 @@ Notes: "<constraints every task must respect>"
 - Task IDs read `<stage>.<track><n>`. Tasks in one track run in order. Different tracks may run in parallel, up to three at once, so keep tasks that touch the same files in one track.
 - The `## Brief` is optional. Claude and its workers follow the constraints you put there.
 - A plan with no `Status:` line counts as approved and starts running straight away. Add a `Status: draft` line near the top if you want to be asked first.
+- A plan with no `Mode:` line runs one stage at a time. Add a `Mode: auto` line near the top to run every stage without stopping.
 
 Plans in other checklist formats work too, for example a superpowers plan with `### Task N` headings and `- [ ]` steps.
 
@@ -57,7 +71,7 @@ Plans in other checklist formats work too, for example a superpowers plan with `
 
 | Part | What it does |
 | --- | --- |
-| `skills/run` | The orchestrator protocol: delegate with pointers instead of pasted context, keep worker replies short, save state to files, commit each task's own files, stop at the end of every stage, and remind you to `/clear` at stage boundaries, topic changes, and breaks |
+| `skills/run` | The orchestrator protocol: delegate with pointers instead of pasted context, keep worker replies short, save state to files, and commit each task's own files. In manual mode it stops at the end of every stage and reminds you to `/clear` at stage boundaries, topic changes, and breaks. In auto mode it hands each stage to a fresh subagent and keeps going |
 | `skills/plan` | The planning steps: ask you once, save your notes as a brief, write the plan, and wait for your approval. `run` loads it only when you give it a new goal, so resuming a plan stays cheap |
 | `hooks/clear-reminder.py` | A `Stop` hook that reads the session's real context size and shows you a 🧹 warning past 150k tokens, then every 40k after that. Only you see it, not Claude. It goes quiet after you clear |
 
@@ -65,7 +79,7 @@ Plans in other checklist formats work too, for example a superpowers plan with `
 
 The skills are plain Markdown. The hook is one short Python script that runs locally: it reads only the token counts in your session transcript, makes no network calls, and writes a tiny state file to your system temp folder. It never sends or stores your conversation.
 
-In your project, the skills write the plan file (`docs/plan*.md`) and progress notes under `docs/progress/`, and make the code changes and commits your plan calls for. Each commit stages only the finished task's files by name, so unrelated changes in your working tree stay out of it.
+In your project, the skills write the plan file (`docs/orchestrate/plan*.md`) and progress notes under `docs/orchestrate/progress/`, and make the code changes and commits your plan calls for. Each commit stages only the finished task's files by name, so unrelated changes in your working tree stay out of it.
 
 ## Settings
 

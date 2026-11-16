@@ -27,7 +27,7 @@ Goal: $ARGUMENTS
 
    The reply to this message, `go` included, is input for the plan and never approval of it. Ask as few questions as the plan needs, and never more than 10. Ask a question only if it is something only the user can answer and a wrong guess would noticeably hurt the plan: scope, priorities, constraints, risky or hard-to-reverse choices. The more a question affects the quality of the plan, the more it is worth asking. Do not ask about details you can decide yourself or the planner can find in the code. Every question carries a concrete recommendation, so replying `go` is always a good answer. Put the questions that matter most first.
 
-3. **Save the brief.** Create `docs/plan.md`, or `docs/plan-<slug>.md` if that file exists:
+3. **Save the brief.** Create `docs/orchestrate/plan.md`, or `docs/orchestrate/plan-<slug>.md` if that file exists:
 
    ```markdown
    # Plan: <project>
@@ -59,13 +59,15 @@ Goal: $ARGUMENTS
 
 5. **Review.** Show the user the plan file path, each stage with its tasks one line each (only stage titles and task counts if there are more than 30 tasks), and the assumptions and open questions. End with:
 
-   > Reply `approve` to start, tell me what to change, or edit the file yourself and then say `approve`.
+   > Reply `approve` to run one stage at a time: I stop after each stage so you can check it and /clear.
+   > Reply `approve auto` to run every stage without stopping: each stage runs in its own fresh subagent, and I stop only if one is blocked.
+   > Or tell me what to change, or edit the file yourself and then approve.
 
-   Then wait. Approval is the user's reply to this review message. For changes, make them (send large ones back to a worker), say what changed, and ask again. If the user edited the file, grep it again. On approval, set `Status: approved`.
+   Then wait. Approval is the user's reply to this review message. For changes, make them (send large ones back to a worker), say what changed, and ask again. If the user edited the file, grep it again. On approval, set `Status: approved` and write the mode on the line below it: `Mode: auto` if they chose auto, otherwise `Mode: manual`.
 
 6. **Clear or continue.** If planning took more than one round of questions or changes, or this session held other work before the plan, end your message with exactly:
 
    > 🧹 **Good time to /clear** — plan approved. State is saved in `<plan file>`.
    > After clearing, run: `/orchestrate:run <plan file>`
 
-   Otherwise start Stage 1 now under the `orchestrate:run` skill. Invoke it with the plan file if it is not loaded yet.
+   Otherwise start Stage 1 now under the `orchestrate:run` skill, in the mode the user chose. Invoke it with the plan file if it is not loaded yet.

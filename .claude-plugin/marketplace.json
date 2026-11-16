@@ -6,7 +6,7 @@
     {
       "name": "orchestrate",
       "source": "./plugins/orchestrate",
-      "description": "Run multi-stage plans with a thin orchestrator and get reminded when to /clear",
+      "description": "Run multi-stage plans with a thin orchestrator: get reminded when to /clear, or run every stage hands-off",
       "license": "MIT"
     }
   ]
