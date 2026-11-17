@@ -4,6 +4,13 @@ A Claude Code plugin for running big, multi-stage plans without burning through 
 
 It turns your main session into a **thin orchestrator**: Claude writes the plan for you to approve, the plan lives in a file, and tasks go to small focused workers that report back in a few lines. You choose how the stages run: one at a time, with Claude telling you when it's a good moment to `/clear`, or all of them back to back with no clearing at all. A hook also warns you when your session's context grows past about 150k tokens.
 
+## Example prompts
+
+- `/orchestrate:run add CSV export to the reports page`
+- `/orchestrate:run migrate the test suite from unittest to pytest, one module at a time`
+- `/orchestrate:run docs/orchestrate/plan.md` (resume or run a plan you already have)
+- "Plan and carry out a refactor of the billing module, and run every stage without stopping." (triggers `orchestrate:run` automatically)
+
 ## Install
 
 In Claude Code:
